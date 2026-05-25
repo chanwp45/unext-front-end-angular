@@ -1,0 +1,91 @@
+<div class="page-header">
+  <h1 class="page-title"><mat-icon>school</mat-icon> ข้อมูลนักศึกษา</h1>
+  <button mat-raised-button color="primary" (click)="openRegisterDialog()">
+    <mat-icon>person_add</mat-icon> รับสมัครนักศึกษา
+  </button>
+</div>
+
+<div class="filter-row" [formGroup]="filterForm">
+  <mat-form-field appearance="outline" class="filter-field">
+    <mat-label>ค้นหา</mat-label>
+    <input matInput formControlName="keyword" placeholder="รหัสนักศึกษา, ชื่อ, เลขบัตรประชาชน..." />
+    <mat-icon matSuffix>search</mat-icon>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="filter-select">
+    <mat-label>สถานะ</mat-label>
+    <mat-select formControlName="status">
+      @for (opt of statusOptions; track opt.value) {
+        <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+</div>
+
+@if (loading) { <mat-progress-bar mode="indeterminate" /> }
+
+<div class="table-card mat-elevation-z2">
+  <table mat-table [dataSource]="students">
+    <ng-container matColumnDef="student_id">
+      <th mat-header-cell *matHeaderCellDef>รหัสนักศึกษา</th>
+      <td mat-cell *matCellDef="let row">{{ row.student_id }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="name_th">
+      <th mat-header-cell *matHeaderCellDef>ชื่อ-สกุล</th>
+      <td mat-cell *matCellDef="let row">
+        <div class="name-cell">
+          <span>{{ row.title_th }}{{ row.first_name_th }} {{ row.last_name_th }}</span>
+          <small class="text-muted">{{ row.first_name_en }} {{ row.last_name_en }}</small>
+        </div>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="curriculum">
+      <th mat-header-cell *matHeaderCellDef>หลักสูตร</th>
+      <td mat-cell *matCellDef="let row">
+        <div class="name-cell">
+          <span>{{ row.curriculum.curriculum_name_th }}</span>
+          <small class="text-muted">{{ row.curriculum.curriculum_code }}</small>
+        </div>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="admission_year">
+      <th mat-header-cell *matHeaderCellDef>ปีเข้า (พ.ศ.)</th>
+      <td mat-cell *matCellDef="let row">{{ row.admission_year }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="student_status">
+      <th mat-header-cell *matHeaderCellDef>สถานะ</th>
+      <td mat-cell *matCellDef="let row">
+        <span class="status-chip" [ngClass]="getStatusClass(row.student_status)">
+          {{ getStatusLabel(row.student_status) }}
+        </span>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let row" class="actions-cell">
+        <button mat-icon-button matTooltip="ดูรายละเอียด" (click)="viewDetail(row.student_id)">
+          <mat-icon>visibility</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="clickable-row" (click)="viewDetail(row.student_id)"></tr>
+    <tr class="mat-row" *matNoDataRow>
+      <td class="mat-cell no-data" [attr.colspan]="displayedColumns.length">ไม่พบข้อมูลนักศึกษา</td>
+    </tr>
+  </table>
+
+  <mat-paginator
+    [length]="totalItems"
+    [pageSize]="pageSize"
+    [pageSizeOptions]="[10, 20, 50, 100]"
+    (page)="onPageChange($event)"
+    showFirstLastButtons
+  />
+</div>

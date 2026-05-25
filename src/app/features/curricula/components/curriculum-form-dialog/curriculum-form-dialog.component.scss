@@ -1,0 +1,17 @@
+.header-curriculum {
+  background: linear-gradient(135deg, #4527a0 0%, #7c4dff 100%);
+  box-shadow: 0 4px 16px rgba(69, 39, 160, 0.3);
+}
+
+.curriculum-submit-btn {
+  background: linear-gradient(135deg, #4527a0, #7c4dff) !important;
+  box-shadow: 0 4px 12px rgba(124, 77, 255, 0.4) !important;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0 16px;
+
+  .col-2 { grid-column: span 2; }
+}

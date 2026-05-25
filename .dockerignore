@@ -1,0 +1,14 @@
+node_modules
+dist
+.git
+.gitignore
+.editorconfig
+coverage
+*.log
+.env
+.env.*
+.DS_Store
+Thumbs.db
+.vscode
+.claude
+docs

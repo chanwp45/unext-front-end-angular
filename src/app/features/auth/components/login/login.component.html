@@ -1,0 +1,113 @@
+<div class="login-page">
+
+  <!-- Left panel — branding -->
+  <div class="brand-panel">
+    <div class="brand-backdrop"></div>
+    <div class="brand-orb orb-1"></div>
+    <div class="brand-orb orb-2"></div>
+    <div class="brand-orb orb-3"></div>
+
+    <div class="brand-content">
+      <div class="brand-logo">
+        <mat-icon>school</mat-icon>
+      </div>
+      <h1 class="brand-name">U-Next</h1>
+      <p class="brand-tagline">ระบบจัดการมหาวิทยาลัย</p>
+      <p class="brand-desc">
+        บริหารข้อมูลนักศึกษา หลักสูตร และบุคลากร<br>
+        ในที่เดียวอย่างครบครัน
+      </p>
+
+      <div class="brand-features">
+        <div class="feature-item">
+          <mat-icon>people</mat-icon>
+          <span>จัดการนักศึกษา</span>
+        </div>
+        <div class="feature-item">
+          <mat-icon>menu_book</mat-icon>
+          <span>บริหารหลักสูตร</span>
+        </div>
+        <div class="feature-item">
+          <mat-icon>account_balance</mat-icon>
+          <span>ข้อมูลคณะ/สาขา</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="brand-footer">© 2026 U-Next University System</div>
+  </div>
+
+  <!-- Right panel — form -->
+  <div class="form-panel">
+    <div class="form-card">
+
+      <div class="form-header">
+        <div class="form-logo-sm">
+          <mat-icon>school</mat-icon>
+        </div>
+        <h2 class="form-title">ยินดีต้อนรับ</h2>
+        <p class="form-subtitle">กรุณาเข้าสู่ระบบเพื่อดำเนินการต่อ</p>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="login-form">
+
+        <mat-form-field appearance="outline" class="field">
+          <mat-label>อีเมล</mat-label>
+          <input
+            matInput
+            type="email"
+            formControlName="email"
+            autocomplete="email"
+            placeholder="staff@university.ac.th"
+          />
+          <mat-icon matSuffix class="field-icon">email</mat-icon>
+          @if (form.controls.email.hasError('required') && form.controls.email.touched) {
+            <mat-error>กรุณากรอกอีเมล</mat-error>
+          } @else if (form.controls.email.hasError('email') && form.controls.email.touched) {
+            <mat-error>รูปแบบอีเมลไม่ถูกต้อง</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="field">
+          <mat-label>รหัสผ่าน</mat-label>
+          <input
+            matInput
+            [type]="showPassword ? 'text' : 'password'"
+            formControlName="password"
+            autocomplete="current-password"
+          />
+          <button mat-icon-button matSuffix type="button" (click)="showPassword = !showPassword" class="pw-toggle">
+            <mat-icon>{{ showPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+          @if (form.controls.password.hasError('required') && form.controls.password.touched) {
+            <mat-error>กรุณากรอกรหัสผ่าน</mat-error>
+          }
+        </mat-form-field>
+
+        @if (errorMessage) {
+          <div class="error-alert">
+            <mat-icon>error_outline</mat-icon>
+            <span>{{ errorMessage }}</span>
+          </div>
+        }
+
+        <button
+          mat-raised-button
+          color="primary"
+          type="submit"
+          class="submit-btn"
+          [disabled]="loading"
+        >
+          @if (loading) {
+            <mat-spinner diameter="22" />
+          } @else {
+            เข้าสู่ระบบ
+          }
+        </button>
+
+      </form>
+
+    </div>
+  </div>
+
+</div>

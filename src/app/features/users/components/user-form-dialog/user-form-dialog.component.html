@@ -1,0 +1,83 @@
+<div class="dialog-header" [ngClass]="isEdit ? 'header-edit' : 'header-add'">
+  <div class="dialog-header-icon">
+    <mat-icon>{{ isEdit ? 'edit' : 'person_add' }}</mat-icon>
+  </div>
+  <div>
+    <h2 mat-dialog-title>{{ isEdit ? 'แก้ไขผู้ใช้งาน' : 'เพิ่มผู้ใช้งานใหม่' }}</h2>
+    <p class="dialog-subtitle">{{ isEdit ? data?.email : 'กรอกข้อมูลผู้ใช้งานใหม่' }}</p>
+  </div>
+  <button mat-icon-button mat-dialog-close class="close-btn">
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
+
+<mat-dialog-content class="dialog-body">
+  <form [formGroup]="form" class="form-grid">
+
+    @if (!isEdit) {
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>อีเมล</mat-label>
+        <input matInput formControlName="email" type="email" placeholder="example@university.ac.th" />
+        <mat-icon matSuffix>email</mat-icon>
+        @if (form.get('email')?.hasError('required')) {
+          <mat-error>กรุณากรอกอีเมล</mat-error>
+        } @else if (form.get('email')?.hasError('email')) {
+          <mat-error>รูปแบบอีเมลไม่ถูกต้อง</mat-error>
+        }
+      </mat-form-field>
+    }
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>{{ isEdit ? 'รหัสผ่านใหม่ (เว้นว่างถ้าไม่ต้องการเปลี่ยน)' : 'รหัสผ่าน' }}</mat-label>
+      <input matInput formControlName="password" [type]="showPassword ? 'text' : 'password'" />
+      <button mat-icon-button matSuffix type="button" (click)="showPassword = !showPassword">
+        <mat-icon>{{ showPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+      </button>
+      @if (form.get('password')?.hasError('required')) {
+        <mat-error>กรุณากรอกรหัสผ่าน</mat-error>
+      } @else if (form.get('password')?.hasError('minlength')) {
+        <mat-error>รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>บทบาท</mat-label>
+      <mat-select formControlName="role">
+        @for (opt of roleOptions; track opt.value) {
+          <mat-option [value]="opt.value">
+            <mat-icon class="role-icon">{{ opt.icon }}</mat-icon>
+            {{ opt.label }}
+          </mat-option>
+        }
+      </mat-select>
+      <mat-icon matSuffix>shield</mat-icon>
+    </mat-form-field>
+
+    @if (isEdit) {
+      <div class="toggle-row">
+        <div class="toggle-label">
+          <mat-icon>{{ form.get('active')?.value ? 'check_circle' : 'cancel' }}</mat-icon>
+          <span>สถานะบัญชี: <strong>{{ form.get('active')?.value ? 'ใช้งาน' : 'ระงับการใช้งาน' }}</strong></span>
+        </div>
+        <mat-slide-toggle formControlName="active" color="primary" />
+      </div>
+    }
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="dialog-actions">
+  <button mat-button mat-dialog-close>ยกเลิก</button>
+  <button
+    mat-raised-button
+    color="primary"
+    [disabled]="form.invalid || loading"
+    (click)="submit()"
+    class="submit-btn"
+  >
+    @if (loading) {
+      <mat-spinner diameter="20" />
+    } @else {
+      {{ isEdit ? 'บันทึก' : 'เพิ่มผู้ใช้งาน' }}
+    }
+  </button>
+</mat-dialog-actions>

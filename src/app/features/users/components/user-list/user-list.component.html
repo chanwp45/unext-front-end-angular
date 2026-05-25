@@ -1,0 +1,104 @@
+<div class="page-header">
+  <div class="page-title-group">
+    <div class="page-icon-wrap">
+      <mat-icon>manage_accounts</mat-icon>
+    </div>
+    <div>
+      <h1 class="page-title">จัดการผู้ใช้งาน</h1>
+      <p class="page-subtitle">บัญชีผู้ใช้ทั้งหมดในระบบ</p>
+    </div>
+  </div>
+  <button mat-raised-button color="primary" class="add-btn" (click)="openAddDialog()">
+    <mat-icon>person_add</mat-icon> เพิ่มผู้ใช้งาน
+  </button>
+</div>
+
+<!-- Stats bar -->
+<div class="stats-row">
+  <div class="stat-card">
+    <mat-icon class="stat-icon">people</mat-icon>
+    <div>
+      <div class="stat-value">{{ totalItems }}</div>
+      <div class="stat-label">ผู้ใช้ทั้งหมด</div>
+    </div>
+  </div>
+</div>
+
+@if (loading) { <mat-progress-bar mode="indeterminate" class="progress-bar" /> }
+
+<div class="table-card mat-elevation-z3">
+  <table mat-table [dataSource]="users">
+
+    <ng-container matColumnDef="avatar">
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let row">
+        <div class="avatar" [ngClass]="'avatar-' + row.role.toLowerCase()">
+          {{ getAvatarLetter(row.email) }}
+        </div>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="email">
+      <th mat-header-cell *matHeaderCellDef>อีเมล</th>
+      <td mat-cell *matCellDef="let row">
+        <span class="email-text">{{ row.email }}</span>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="role">
+      <th mat-header-cell *matHeaderCellDef>บทบาท</th>
+      <td mat-cell *matCellDef="let row">
+        <span class="role-chip" [ngClass]="getRoleChipClass(row.role)">
+          {{ getRoleLabel(row.role) }}
+        </span>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="active">
+      <th mat-header-cell *matHeaderCellDef>สถานะ</th>
+      <td mat-cell *matCellDef="let row">
+        <span class="status-chip" [ngClass]="row.active ? 'chip-active' : 'chip-inactive'">
+          <mat-icon class="status-icon">{{ row.active ? 'check_circle' : 'cancel' }}</mat-icon>
+          {{ row.active ? 'ใช้งาน' : 'ระงับ' }}
+        </span>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="created_at">
+      <th mat-header-cell *matHeaderCellDef>สร้างเมื่อ</th>
+      <td mat-cell *matCellDef="let row" class="date-cell">
+        {{ row.created_at | date:'dd/MM/yyyy HH:mm' }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let row" class="actions-cell">
+        <button mat-icon-button matTooltip="แก้ไข" class="action-btn-edit" (click)="openEditDialog(row)">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-icon-button matTooltip="ลบ" class="action-btn-delete" (click)="confirmDelete(row)">
+          <mat-icon>delete_outline</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="table-row"></tr>
+
+    <tr class="mat-row" *matNoDataRow>
+      <td class="mat-cell no-data" [attr.colspan]="displayedColumns.length">
+        <mat-icon>people_outline</mat-icon>
+        <p>ไม่พบข้อมูลผู้ใช้งาน</p>
+      </td>
+    </tr>
+  </table>
+
+  <mat-paginator
+    [length]="totalItems"
+    [pageSize]="pageSize"
+    [pageSizeOptions]="[10, 20, 50]"
+    (page)="onPageChange($event)"
+    showFirstLastButtons
+  />
+</div>

@@ -1,0 +1,158 @@
+<!-- Header -->
+<div class="dialog-header header-student">
+  <div class="dialog-header-icon">
+    <mat-icon>{{ isEdit ? 'edit' : 'person_add' }}</mat-icon>
+  </div>
+  <div class="dialog-title-group">
+    <h2 mat-dialog-title>{{ isEdit ? 'แก้ไขข้อมูลนักศึกษา' : 'รับสมัครนักศึกษาใหม่' }}</h2>
+    <p class="dialog-subtitle">{{ isEdit ? 'อัปเดตข้อมูลนักศึกษา' : 'กรอกข้อมูลนักศึกษาที่ต้องการรับสมัคร' }}</p>
+  </div>
+  <button mat-icon-button mat-dialog-close class="dialog-close-btn">
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
+
+<mat-dialog-content class="dialog-body">
+  <form [formGroup]="form" class="form-grid">
+
+    <div class="form-section-label">ข้อมูลส่วนตัว</div>
+
+    <mat-form-field appearance="outline">
+      <mat-label>เลขบัตรประชาชน * (13 หลัก)</mat-label>
+      <input matInput formControlName="national_id" maxlength="13" />
+      <mat-icon matSuffix>badge</mat-icon>
+      @if (getError(form.get('national_id'), 'required')) {
+        <mat-error>กรุณากรอกเลขบัตรประชาชน</mat-error>
+      } @else if (getError(form.get('national_id'), 'pattern')) {
+        <mat-error>เลขบัตรประชาชนต้องมี 13 หลัก</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>คำนำหน้า *</mat-label>
+      <mat-select formControlName="title_th">
+        <mat-option value="นาย">นาย</mat-option>
+        <mat-option value="นาง">นาง</mat-option>
+        <mat-option value="นางสาว">นางสาว</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>ชื่อ (ภาษาไทย) *</mat-label>
+      <input matInput formControlName="first_name_th" />
+      @if (getError(form.get('first_name_th'), 'required')) {
+        <mat-error>กรุณากรอกชื่อภาษาไทย</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>นามสกุล (ภาษาไทย) *</mat-label>
+      <input matInput formControlName="last_name_th" />
+      @if (getError(form.get('last_name_th'), 'required')) {
+        <mat-error>กรุณากรอกนามสกุลภาษาไทย</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>First Name (EN) *</mat-label>
+      <input matInput formControlName="first_name_en" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Last Name (EN) *</mat-label>
+      <input matInput formControlName="last_name_en" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>วันเกิด *</mat-label>
+      <input matInput [matDatepicker]="picker" formControlName="date_of_birth" [max]="maxDate" />
+      <mat-datepicker-toggle matIconSuffix [for]="picker" />
+      <mat-datepicker #picker />
+      @if (getError(form.get('date_of_birth'), 'required')) {
+        <mat-error>กรุณาเลือกวันเกิด</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>เพศ *</mat-label>
+      <mat-select formControlName="gender">
+        @for (opt of genderOptions; track opt.value) {
+          <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>สัญชาติ *</mat-label>
+      <input matInput formControlName="nationality" />
+      <mat-icon matSuffix>public</mat-icon>
+    </mat-form-field>
+
+    <div class="form-section-label">ข้อมูลติดต่อ</div>
+
+    <mat-form-field appearance="outline">
+      <mat-label>อีเมล *</mat-label>
+      <input matInput type="email" formControlName="email" />
+      <mat-icon matSuffix>email</mat-icon>
+      @if (getError(form.get('email'), 'email')) {
+        <mat-error>รูปแบบอีเมลไม่ถูกต้อง</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>เบอร์โทร *</mat-label>
+      <input matInput formControlName="phone" />
+      <mat-icon matSuffix>phone</mat-icon>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="col-2">
+      <mat-label>ที่อยู่ *</mat-label>
+      <textarea matInput formControlName="address" rows="2"></textarea>
+      <mat-icon matSuffix>home</mat-icon>
+    </mat-form-field>
+
+    <div class="form-section-label">ข้อมูลการศึกษา</div>
+
+    <mat-form-field appearance="outline">
+      <mat-label>หลักสูตร *</mat-label>
+      <mat-select formControlName="curriculum_id">
+        @for (c of curricula; track c.curriculum_id) {
+          <mat-option [value]="c.curriculum_id">{{ c.curriculum_name_th }}</mat-option>
+        }
+      </mat-select>
+      <mat-icon matSuffix>menu_book</mat-icon>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>ปีการศึกษาที่เข้า (พ.ศ.) *</mat-label>
+      <input matInput type="number" formControlName="admission_year" />
+      <mat-icon matSuffix>calendar_today</mat-icon>
+      @if (getError(form.get('admission_year'), 'min')) {
+        <mat-error>ปีต้องไม่น้อยกว่า 2500 (พ.ศ.)</mat-error>
+      }
+    </mat-form-field>
+
+    <div class="form-section-label">ข้อมูลผู้ปกครอง (ไม่บังคับ)</div>
+
+    <mat-form-field appearance="outline">
+      <mat-label>ชื่อผู้ปกครอง</mat-label>
+      <input matInput formControlName="guardian_name" />
+      <mat-icon matSuffix>family_restroom</mat-icon>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>เบอร์โทรผู้ปกครอง</mat-label>
+      <input matInput formControlName="guardian_phone" />
+      <mat-icon matSuffix>phone_in_talk</mat-icon>
+    </mat-form-field>
+
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="dialog-actions">
+  <button mat-button mat-dialog-close>ยกเลิก</button>
+  <button mat-raised-button color="primary" class="dialog-submit-btn student-submit-btn"
+    (click)="submit()" [disabled]="loading">
+    @if (loading) { <mat-spinner diameter="18" /> } @else { {{ isEdit ? 'บันทึก' : 'รับสมัคร' }} }
+  </button>
+</mat-dialog-actions>

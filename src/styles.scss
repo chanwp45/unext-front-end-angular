@@ -1,0 +1,168 @@
+html, body { height: 100%; }
+body {
+  margin: 0;
+  font-family: 'Inter', Roboto, 'Helvetica Neue', sans-serif;
+  background: #f0f4f8;
+  color: #212121;
+}
+
+/* ── Google Fonts (Inter) ─────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* ── Snackbar ─────────────────────────────────────────────── */
+.snack-success .mdc-snackbar__surface {
+  background: #2e7d32 !important;
+  color: white !important;
+}
+.snack-error .mdc-snackbar__surface {
+  background: #c62828 !important;
+  color: white !important;
+}
+
+/* ── Scrollbar ────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #f1f1f1; }
+::-webkit-scrollbar-thumb { background: #c0c0c0; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #a0a0a0; }
+
+/* ── Material table global tweaks ─────────────────────────── */
+.mat-mdc-table {
+  width: 100%;
+  background: white !important;
+}
+
+.mat-mdc-header-row {
+  background: #f8fafc !important;
+  border-bottom: 2px solid #e2e8f0 !important;
+}
+
+.mat-mdc-header-cell {
+  font-weight: 700 !important;
+  font-size: 0.78rem !important;
+  color: #64748b !important;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.mat-mdc-row {
+  border-bottom: 1px solid #f1f5f9 !important;
+}
+
+/* ── Dialog ───────────────────────────────────────────────── */
+.mat-mdc-dialog-container .mdc-dialog__surface {
+  border-radius: 16px !important;
+  overflow: hidden;
+}
+
+/* ── Form field ───────────────────────────────────────────── */
+.mat-mdc-form-field {
+  font-family: 'Inter', Roboto, sans-serif !important;
+}
+
+/* ── Progress bar ─────────────────────────────────────────── */
+.mat-mdc-progress-bar {
+  border-radius: 4px;
+}
+
+/* ── Paginator ────────────────────────────────────────────── */
+.mat-mdc-paginator {
+  border-top: 1px solid #f1f5f9;
+  background: #fafcff !important;
+}
+
+/* ── Button ───────────────────────────────────────────────── */
+.mat-mdc-raised-button {
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.3px !important;
+}
+
+/* ── Chip ─────────────────────────────────────────────────── */
+.status-chip, .role-chip, .code-badge {
+  user-select: none;
+}
+
+/* ══════════════════════════════════════════════════════════
+   SHARED DIALOG STRUCTURE
+   (dialogs render in CDK overlay → global styles reach them)
+   ══════════════════════════════════════════════════════════ */
+
+/* Header strip */
+.dialog-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 22px 20px 20px;
+  position: relative;
+  color: white;
+  flex-shrink: 0;
+
+  h2[mat-dialog-title] {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    padding: 0;
+    color: white;
+    line-height: 1.3;
+  }
+}
+
+.dialog-header-icon {
+  width: 44px;
+  height: 44px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  backdrop-filter: blur(4px);
+
+  .mat-icon { font-size: 22px !important; width: 22px !important; height: 22px !important; color: white !important; }
+}
+
+.dialog-title-group { flex: 1; min-width: 0; }
+
+.dialog-subtitle {
+  margin: 2px 0 0;
+  font-size: 0.78rem;
+  opacity: 0.82;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.dialog-close-btn {
+  position: absolute !important;
+  right: 10px !important;
+  top: 10px !important;
+  color: rgba(255, 255, 255, 0.75) !important;
+  &:hover { color: white !important; background: rgba(255,255,255,0.15) !important; }
+}
+
+/* Body + actions */
+.dialog-body    { padding: 20px 24px 8px  !important; }
+.dialog-actions { padding: 8px  24px 20px !important; gap: 8px; }
+
+/* Submit button — force white label through MDC */
+.dialog-submit-btn {
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  min-width: 100px;
+  --mdc-filled-button-label-text-color: white;
+  --mdc-protected-button-label-text-color: white;
+  color: white !important;
+
+  .mdc-button__label { color: white !important; }
+}
+
+/* Section dividers inside long forms */
+.form-section-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #90a4ae;
+  padding: 8px 0 4px;
+  border-bottom: 1px solid #e8edf2;
+  margin-bottom: 4px;
+  grid-column: span 2;
+}

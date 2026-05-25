@@ -1,0 +1,126 @@
+<div class="page-header">
+  <div class="page-title-group">
+    <div class="page-icon-wrap">
+      <mat-icon>account_balance</mat-icon>
+    </div>
+    <div>
+      <h1 class="page-title">คณะและสาขาวิชา</h1>
+      <p class="page-subtitle">ข้อมูลคณะและสาขาวิชาในมหาวิทยาลัย</p>
+    </div>
+  </div>
+  <div class="header-badge">
+    <mat-icon>info_outline</mat-icon>
+    <span>ข้อมูลอ้างอิง (Read-only)</span>
+  </div>
+</div>
+
+<!-- Stats -->
+<div class="stats-row">
+  <div class="stat-card">
+    <mat-icon class="stat-icon">account_balance</mat-icon>
+    <div>
+      <div class="stat-value">{{ faculties.length }}</div>
+      <div class="stat-label">คณะทั้งหมด</div>
+    </div>
+  </div>
+  <div class="hint-card">
+    <mat-icon>touch_app</mat-icon>
+    <span>คลิกที่แถวเพื่อดูรายการสาขาวิชา</span>
+  </div>
+</div>
+
+@if (loading) { <mat-progress-bar mode="indeterminate" class="progress-bar" /> }
+
+<div class="table-card mat-elevation-z3">
+  <table mat-table [dataSource]="faculties" multiTemplateDataRows>
+
+    <ng-container matColumnDef="expand">
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let row" class="expand-cell">
+        <button mat-icon-button class="expand-btn" [ngClass]="{'expanded': row.expanded}" (click)="toggleExpand(row)">
+          <mat-icon>expand_more</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="code">
+      <th mat-header-cell *matHeaderCellDef>รหัส</th>
+      <td mat-cell *matCellDef="let row">
+        <span class="code-badge">{{ row.code }}</span>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="name_th">
+      <th mat-header-cell *matHeaderCellDef>ชื่อภาษาไทย</th>
+      <td mat-cell *matCellDef="let row">
+        <div class="faculty-name">
+          <div class="faculty-icon" [ngStyle]="{'background': getFacultyColor(row.code)}">
+            {{ row.code.charAt(0) }}
+          </div>
+          <span>{{ row.name_th }}</span>
+        </div>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="name_en">
+      <th mat-header-cell *matHeaderCellDef>ชื่อภาษาอังกฤษ</th>
+      <td mat-cell *matCellDef="let row" class="name-en">{{ row.name_en }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="dept_count">
+      <th mat-header-cell *matHeaderCellDef>สาขาวิชา</th>
+      <td mat-cell *matCellDef="let row">
+        @if (row.departments) {
+          <span class="dept-count-badge">{{ row.departments.length }} สาขา</span>
+        } @else {
+          <span class="dept-count-badge ghost">—</span>
+        }
+      </td>
+    </ng-container>
+
+    <!-- Expanded detail row -->
+    <ng-container matColumnDef="expandedDetail">
+      <td mat-cell *matCellDef="let row" [attr.colspan]="displayedColumns.length" class="expanded-cell">
+        <div class="expanded-content" [@expandRow]="isExpanded(row)">
+          @if (row.loadingDepts) {
+            <div class="dept-loading">
+              <mat-spinner diameter="28" />
+              <span>กำลังโหลดสาขาวิชา...</span>
+            </div>
+          } @else if (row.departments?.length) {
+            <div class="dept-grid">
+              @for (dept of row.departments; track dept.id) {
+                <div class="dept-card">
+                  <div class="dept-icon">
+                    <mat-icon>class</mat-icon>
+                  </div>
+                  <div class="dept-info">
+                    <div class="dept-code">{{ dept.code }}</div>
+                    <div class="dept-name-th">{{ dept.name_th }}</div>
+                    <div class="dept-name-en">{{ dept.name_en }}</div>
+                  </div>
+                </div>
+              }
+            </div>
+          } @else if (row.departments) {
+            <div class="no-depts">ไม่มีสาขาวิชา</div>
+          }
+        </div>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+        class="faculty-row"
+        [ngClass]="{'row-expanded': row.expanded}"
+        (click)="toggleExpand(row)"></tr>
+    <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="detail-row"></tr>
+
+    <tr class="mat-row" *matNoDataRow>
+      <td class="mat-cell no-data" [attr.colspan]="displayedColumns.length">
+        <mat-icon>account_balance</mat-icon>
+        <p>ไม่พบข้อมูลคณะ</p>
+      </td>
+    </tr>
+  </table>
+</div>

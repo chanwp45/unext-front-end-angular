@@ -1,0 +1,91 @@
+@if (loading) { <mat-progress-bar mode="indeterminate" /> }
+
+@if (student) {
+  <div class="detail-header">
+    <button mat-icon-button (click)="back()"><mat-icon>arrow_back</mat-icon></button>
+    <div class="student-avatar">
+      @if (student.photo_url) {
+        <img [src]="student.photo_url" [alt]="student.first_name_th" class="photo" />
+      } @else {
+        <div class="photo-placeholder"><mat-icon>person</mat-icon></div>
+      }
+    </div>
+    <div class="header-info">
+      <h1 class="page-title">
+        {{ student.title_th }}{{ student.first_name_th }} {{ student.last_name_th }}
+      </h1>
+      <span class="student-id-label">รหัสนักศึกษา: {{ student.student_id }}</span>
+    </div>
+    <span class="status-chip" [ngClass]="getStatusClass(student.student_status)">
+      {{ getStatusLabel(student.student_status) }}
+    </span>
+    <span class="spacer"></span>
+    <button mat-stroked-button (click)="openPhotoDialog()"><mat-icon>photo_camera</mat-icon> รูปภาพ</button>
+    <button mat-stroked-button (click)="openStatusDialog()"><mat-icon>swap_horiz</mat-icon> เปลี่ยนสถานะ</button>
+    <button mat-stroked-button (click)="openEdit()"><mat-icon>edit</mat-icon> แก้ไข</button>
+  </div>
+
+  <mat-tab-group>
+    <mat-tab label="ข้อมูลส่วนตัว">
+      <div class="info-grid">
+        <div class="info-item"><span class="label">เลขบัตรประชาชน</span><span>{{ student.national_id }}</span></div>
+        <div class="info-item"><span class="label">ชื่อ-สกุล (EN)</span><span>{{ student.first_name_en }} {{ student.last_name_en }}</span></div>
+        <div class="info-item"><span class="label">วันเกิด</span><span>{{ student.date_of_birth | date:'dd/MM/yyyy' }}</span></div>
+        <div class="info-item"><span class="label">เพศ</span><span>{{ student.gender }}</span></div>
+        <div class="info-item"><span class="label">สัญชาติ</span><span>{{ student.nationality }}</span></div>
+        <div class="info-item"><span class="label">อีเมล</span><span>{{ student.email }}</span></div>
+        <div class="info-item"><span class="label">เบอร์โทร</span><span>{{ student.phone }}</span></div>
+        <div class="info-item col-2"><span class="label">ที่อยู่</span><span>{{ student.address }}</span></div>
+        <div class="info-item"><span class="label">ผู้ปกครอง</span><span>{{ student.guardian_name || '-' }}</span></div>
+        <div class="info-item"><span class="label">เบอร์โทรผู้ปกครอง</span><span>{{ student.guardian_phone || '-' }}</span></div>
+      </div>
+    </mat-tab>
+
+    <mat-tab label="ข้อมูลการศึกษา">
+      <div class="info-grid">
+        <div class="info-item"><span class="label">หลักสูตร</span><span>{{ student.curriculum.curriculum_name_th }}</span></div>
+        <div class="info-item"><span class="label">รหัสหลักสูตร</span><span>{{ student.curriculum.curriculum_code }}</span></div>
+        <div class="info-item"><span class="label">ปีการศึกษาที่เข้า (พ.ศ.)</span><span>{{ student.admission_year }}</span></div>
+        <div class="info-item"><span class="label">สถานะนักศึกษา</span>
+          <span class="status-chip" [ngClass]="getStatusClass(student.student_status)">
+            {{ getStatusLabel(student.student_status) }}
+          </span>
+        </div>
+        <div class="info-item"><span class="label">วันที่สร้าง</span><span>{{ student.created_at | date:'dd/MM/yyyy HH:mm' }}</span></div>
+        <div class="info-item"><span class="label">แก้ไขล่าสุด</span><span>{{ student.updated_at | date:'dd/MM/yyyy HH:mm' }}</span></div>
+      </div>
+    </mat-tab>
+
+    <mat-tab label="ประวัติการแก้ไข">
+      @if (auditLoading) { <mat-progress-bar mode="indeterminate" /> }
+      <table mat-table [dataSource]="audits" class="audit-table">
+        <ng-container matColumnDef="performed_at">
+          <th mat-header-cell *matHeaderCellDef>วันที่/เวลา</th>
+          <td mat-cell *matCellDef="let row">{{ row.performed_at | date:'dd/MM/yyyy HH:mm' }}</td>
+        </ng-container>
+        <ng-container matColumnDef="action">
+          <th mat-header-cell *matHeaderCellDef>การกระทำ</th>
+          <td mat-cell *matCellDef="let row">{{ getActionLabel(row.action) }}</td>
+        </ng-container>
+        <ng-container matColumnDef="changed_fields">
+          <th mat-header-cell *matHeaderCellDef>ฟิลด์ที่เปลี่ยน</th>
+          <td mat-cell *matCellDef="let row">{{ row.changed_fields?.join(', ') || '-' }}</td>
+        </ng-container>
+        <ng-container matColumnDef="performed_by_name">
+          <th mat-header-cell *matHeaderCellDef>ผู้ดำเนินการ</th>
+          <td mat-cell *matCellDef="let row">{{ row.performed_by_name }}</td>
+        </ng-container>
+        <ng-container matColumnDef="reason">
+          <th mat-header-cell *matHeaderCellDef>เหตุผล / เอกสาร</th>
+          <td mat-cell *matCellDef="let row">{{ row.reason || row.document_ref || '-' }}</td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="auditColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: auditColumns;"></tr>
+        <tr class="mat-row" *matNoDataRow>
+          <td class="mat-cell no-data" [attr.colspan]="auditColumns.length">ไม่มีประวัติการแก้ไข</td>
+        </tr>
+      </table>
+      <mat-paginator [length]="auditTotal" [pageSize]="20" (page)="onAuditPage($event)" showFirstLastButtons />
+    </mat-tab>
+  </mat-tab-group>
+}

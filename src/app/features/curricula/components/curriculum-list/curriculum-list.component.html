@@ -1,0 +1,120 @@
+<div class="page-header">
+  <h1 class="page-title">
+    <mat-icon>menu_book</mat-icon> จัดการหลักสูตร
+  </h1>
+  <button mat-raised-button color="primary" (click)="openAddDialog()">
+    <mat-icon>add</mat-icon> เพิ่มหลักสูตร
+  </button>
+</div>
+
+<!-- Filters -->
+<div class="filter-row" [formGroup]="filterForm">
+  <mat-form-field appearance="outline" class="filter-field">
+    <mat-label>ค้นหา</mat-label>
+    <input matInput formControlName="keyword" placeholder="ชื่อหลักสูตร, รหัส..." />
+    <mat-icon matSuffix>search</mat-icon>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="filter-select">
+    <mat-label>สถานะ</mat-label>
+    <mat-select formControlName="status">
+      @for (opt of statusOptions; track opt.value) {
+        <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="filter-select">
+    <mat-label>ระดับการศึกษา</mat-label>
+    <mat-select formControlName="degreeLevel">
+      <mat-option value="">ทั้งหมด</mat-option>
+      @for (level of degreeLevels; track level) {
+        <mat-option [value]="level">{{ level }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+</div>
+
+@if (loading) { <mat-progress-bar mode="indeterminate" /> }
+
+<div class="table-card mat-elevation-z2">
+  <table mat-table [dataSource]="curricula">
+    <ng-container matColumnDef="curriculum_code">
+      <th mat-header-cell *matHeaderCellDef>รหัสหลักสูตร</th>
+      <td mat-cell *matCellDef="let row">{{ row.curriculum_code }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="curriculum_name_th">
+      <th mat-header-cell *matHeaderCellDef>ชื่อหลักสูตร (TH)</th>
+      <td mat-cell *matCellDef="let row">
+        <div class="name-cell">
+          <span>{{ row.curriculum_name_th }}</span>
+          <small class="text-muted">{{ row.curriculum_name_en }}</small>
+        </div>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="degree_level">
+      <th mat-header-cell *matHeaderCellDef>ระดับ</th>
+      <td mat-cell *matCellDef="let row">{{ row.degree_level }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="faculty_name">
+      <th mat-header-cell *matHeaderCellDef>คณะ / สาขา</th>
+      <td mat-cell *matCellDef="let row">
+        <div class="name-cell">
+          <span>{{ row.faculty_name }}</span>
+          <small class="text-muted">{{ row.department_name }}</small>
+        </div>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="total_credits">
+      <th mat-header-cell *matHeaderCellDef>หน่วยกิต</th>
+      <td mat-cell *matCellDef="let row">{{ row.total_credits }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="status">
+      <th mat-header-cell *matHeaderCellDef>สถานะ</th>
+      <td mat-cell *matCellDef="let row">
+        <span class="status-chip" [ngClass]="getStatusChipClass(row.status)">
+          {{ getStatusLabel(row.status) }}
+        </span>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let row" class="actions-cell">
+        <button mat-icon-button matTooltip="ดูรายละเอียด" (click)="viewDetail(row.curriculum_id)">
+          <mat-icon>visibility</mat-icon>
+        </button>
+        <button mat-icon-button matTooltip="แก้ไข" (click)="openEditDialog(row)">
+          <mat-icon>edit</mat-icon>
+        </button>
+        @if (row.status !== 'INACTIVE') {
+          <button mat-icon-button matTooltip="ยกเลิกหลักสูตร" color="warn" (click)="confirmDelete(row)">
+            <mat-icon>block</mat-icon>
+          </button>
+        }
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+    <tr class="mat-row" *matNoDataRow>
+      <td class="mat-cell no-data" [attr.colspan]="displayedColumns.length">
+        ไม่พบข้อมูลหลักสูตร
+      </td>
+    </tr>
+  </table>
+
+  <mat-paginator
+    [length]="totalItems"
+    [pageSize]="pageSize"
+    [pageSizeOptions]="[10, 20, 50]"
+    (page)="onPageChange($event)"
+    showFirstLastButtons
+  />
+</div>
