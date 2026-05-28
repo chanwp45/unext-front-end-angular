@@ -8,8 +8,10 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { CurriculaApiService } from '../../services/curricula-api.service';
 import { FacultiesApiService } from '../../../faculties/services/faculties-api.service';
+import { MasterApiService } from '../../../../shared/services/master-api.service';
 import { Curriculum, CurriculumStatus } from '../../models/curriculum.model';
 import { Faculty, Department } from '../../../faculties/models/faculty.model';
 
@@ -34,13 +36,15 @@ export class CurriculumFormDialogComponent implements OnInit {
   private fb = inject(FormBuilder);
   private api = inject(CurriculaApiService);
   private facultyApi = inject(FacultiesApiService);
+  private masterApi = inject(MasterApiService);
   private dialogRef = inject(MatDialogRef<CurriculumFormDialogComponent>);
+  private snackBar = inject(MatSnackBar);
 
   isEdit = false;
   loading = false;
   faculties: Faculty[] = [];
   departments: Department[] = [];
-  degreeLevels = ['ปริญญาตรี', 'ปริญญาโท', 'ปริญญาเอก'];
+  degreeLevels: string[] = [];
   statusOptions: { value: CurriculumStatus; label: string }[] = [
     { value: 'DRAFT', label: 'ฉบับร่าง' },
     { value: 'ACTIVE', label: 'เปิดใช้งาน' },
@@ -66,6 +70,9 @@ export class CurriculumFormDialogComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.masterApi.getMasterData().subscribe((master) => {
+      this.degreeLevels = master.degree_levels;
+    });
     this.facultyApi.getFaculties().subscribe((res) => {
       this.faculties = res.data ?? [];
     });
@@ -85,7 +92,7 @@ export class CurriculumFormDialogComponent implements OnInit {
   }
 
   submit(): void {
-    if (this.form.invalid) return;
+    if (this.form.invalid) { this.form.markAllAsTouched(); return; }
     this.loading = true;
     const value = this.form.getRawValue();
     const body = {
@@ -101,7 +108,10 @@ export class CurriculumFormDialogComponent implements OnInit {
 
     request$.subscribe({
       next: () => { this.loading = false; this.dialogRef.close(true); },
-      error: () => (this.loading = false),
+      error: () => {
+        this.loading = false;
+        this.snackBar.open('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง', 'ปิด', { duration: 4000 });
+      },
     });
   }
 }

@@ -9,10 +9,10 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { StudentsApiService } from '../../services/students-api.service';
-import { FacultiesApiService } from '../../../faculties/services/faculties-api.service';
 import { CurriculaApiService } from '../../../curricula/services/curricula-api.service';
+import { MasterApiService } from '../../../../shared/services/master-api.service';
 import { Student, Gender } from '../../models/student.model';
 import { Curriculum } from '../../../curricula/models/curriculum.model';
 
@@ -30,7 +30,6 @@ import { Curriculum } from '../../../curricula/models/curriculum.model';
     MatIconModule,
     MatProgressSpinnerModule,
     MatDatepickerModule,
-    MatNativeDateModule,
   ],
   templateUrl: './student-form-dialog.component.html',
   styleUrl: './student-form-dialog.component.scss',
@@ -39,11 +38,15 @@ export class StudentFormDialogComponent implements OnInit {
   private fb = inject(FormBuilder);
   private api = inject(StudentsApiService);
   private curriculaApi = inject(CurriculaApiService);
+  private masterApi = inject(MasterApiService);
   private dialogRef = inject(MatDialogRef<StudentFormDialogComponent>);
+  private snackBar = inject(MatSnackBar);
 
   isEdit = false;
   loading = false;
   curricula: Curriculum[] = [];
+  titleOptions: string[] = [];
+  nationalityOptions: string[] = [];
   maxDate = new Date();
 
   genderOptions: { value: Gender; label: string }[] = [
@@ -76,6 +79,10 @@ export class StudentFormDialogComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.masterApi.getMasterData().subscribe((master) => {
+      this.titleOptions = master.title_th;
+      this.nationalityOptions = master.nationalities;
+    });
     this.curriculaApi.getCurricula({ status: 'ACTIVE', limit: 100 }).subscribe((res) => {
       this.curricula = res.data?.items ?? [];
     });
@@ -113,7 +120,10 @@ export class StudentFormDialogComponent implements OnInit {
 
     request$.subscribe({
       next: () => { this.loading = false; this.dialogRef.close(true); },
-      error: () => (this.loading = false),
+      error: () => {
+        this.loading = false;
+        this.snackBar.open('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง', 'ปิด', { duration: 4000 });
+      },
     });
   }
 }

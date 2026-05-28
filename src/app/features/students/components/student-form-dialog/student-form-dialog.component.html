@@ -31,9 +31,9 @@
     <mat-form-field appearance="outline">
       <mat-label>คำนำหน้า *</mat-label>
       <mat-select formControlName="title_th">
-        <mat-option value="นาย">นาย</mat-option>
-        <mat-option value="นาง">นาง</mat-option>
-        <mat-option value="นางสาว">นางสาว</mat-option>
+        @for (t of titleOptions; track t) {
+          <mat-option [value]="t">{{ t }}</mat-option>
+        }
       </mat-select>
     </mat-form-field>
 
@@ -84,7 +84,11 @@
 
     <mat-form-field appearance="outline">
       <mat-label>สัญชาติ *</mat-label>
-      <input matInput formControlName="nationality" />
+      <mat-select formControlName="nationality">
+        @for (n of nationalityOptions; track n) {
+          <mat-option [value]="n">{{ n }}</mat-option>
+        }
+      </mat-select>
       <mat-icon matSuffix>public</mat-icon>
     </mat-form-field>
 

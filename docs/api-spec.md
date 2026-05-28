@@ -15,8 +15,9 @@
 4. [Faculty & Department Lookup](#4-faculty--department-lookup)
 5. [Curriculum Management](#5-curriculum-management)
 6. [Student Management](#6-student-management)
-7. [Enums Reference](#7-enums-reference)
-8. [Error Codes Reference](#8-error-codes-reference)
+7. [Master Data](#7-master-data)
+8. [Enums Reference](#8-enums-reference)
+9. [Error Codes Reference](#9-error-codes-reference)
 
 ---
 
@@ -840,7 +841,98 @@ View the full audit history for a student record.
 
 ---
 
-## 7. Enums Reference
+## 7. Master Data
+
+> **Required Role:** Any authenticated user.  
+> **Cache recommendation:** Frontend should cache this response for the session (no polling needed — data changes infrequently).
+
+---
+
+### GET `/v1/master`
+
+Return all dropdown / reference data in a single call.  
+The frontend uses these lists to populate `degree_level`, `title_th`, and `nationality` fields.
+
+**Query Parameters:** None
+
+**Response `200`:**
+```json
+{
+  "status": "success",
+  "code": 200,
+  "data": {
+    "degree_levels": [
+      "ปริญญาตรี",
+      "ปริญญาโท",
+      "ปริญญาเอก"
+    ],
+    "title_th": [
+      "นาย",
+      "นาง",
+      "นางสาว",
+      "ดร.",
+      "รศ.ดร.",
+      "ศ.ดร."
+    ],
+    "nationalities": [
+      "ไทย",
+      "ลาว",
+      "กัมพูชา",
+      "เมียนมา",
+      "เวียดนาม",
+      "จีน",
+      "ญี่ปุ่น",
+      "เกาหลี",
+      "อินเดีย",
+      "อื่นๆ"
+    ]
+  }
+}
+```
+
+**Response Schema:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `degree_levels` | `string[]` | Ordered list of degree level labels used in `curriculum.degree_level` |
+| `title_th` | `string[]` | Ordered list of Thai title prefixes used in `student.title_th` |
+| `nationalities` | `string[]` | Ordered list of nationality labels used in `student.nationality` |
+
+**Implementation Notes for Backend:**
+
+- Values should be returned in display order (sort_order ascending).
+- Store in a `master_data` table with columns: `category` (`VARCHAR`), `value` (`VARCHAR`), `sort_order` (`INT`), `active` (`BOOLEAN`).
+- Seed data must include all values listed above at minimum.
+- Return only `active = true` records.
+- Response should be cached with `Cache-Control: public, max-age=3600` (1 hour).
+
+**Seed SQL (example):**
+```sql
+INSERT INTO master_data (category, value, sort_order, active) VALUES
+  ('degree_level', 'ปริญญาตรี',  1, true),
+  ('degree_level', 'ปริญญาโท',   2, true),
+  ('degree_level', 'ปริญญาเอก',  3, true),
+  ('title_th', 'นาย',      1, true),
+  ('title_th', 'นาง',      2, true),
+  ('title_th', 'นางสาว',   3, true),
+  ('title_th', 'ดร.',      4, true),
+  ('title_th', 'รศ.ดร.',  5, true),
+  ('title_th', 'ศ.ดร.',   6, true),
+  ('nationality', 'ไทย',      1, true),
+  ('nationality', 'ลาว',      2, true),
+  ('nationality', 'กัมพูชา',   3, true),
+  ('nationality', 'เมียนมา',   4, true),
+  ('nationality', 'เวียดนาม',  5, true),
+  ('nationality', 'จีน',      6, true),
+  ('nationality', 'ญี่ปุ่น',    7, true),
+  ('nationality', 'เกาหลี',    8, true),
+  ('nationality', 'อินเดีย',   9, true),
+  ('nationality', 'อื่นๆ',    10, true);
+```
+
+---
+
+## 8. Enums Reference
 
 ### UserRole
 
@@ -896,7 +988,7 @@ View the full audit history for a student record.
 
 ---
 
-## 8. Error Codes Reference
+## 9. Error Codes Reference
 
 All error responses follow the standard envelope with `"status": "error"`.
 
