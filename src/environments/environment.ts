@@ -1,4 +1,4 @@
 export const environment = {
   production: false,
-  apiBaseUrl: 'https://unext-backend-spring-boot.onrender.com/api',
+  apiBaseUrl: 'https://unext-backend-spring-boot-production.up.railway.app/api',
 };
